@@ -28,8 +28,10 @@ function App() {
   const [showBgPicker, setShowBgPicker] = useState(false);
 
   // 1. FETCH DATA & HYBRID MERGE
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
   useEffect(() => {
-    axios.get("http://localhost:5000/boards").then((res) => {
+    axios.get(`${API_BASE}/boards`).then((res) => {
       const bonusCache = JSON.parse(localStorage.getItem('taskverse-bonus-cache')) || {};
       
       const defaultCovers = {
@@ -174,7 +176,7 @@ function App() {
     const targetList = lists[listIndex];
 
     try {
-        const res = await axios.post("http://localhost:5000/cards", { title: text, listId: targetList.id });
+        const res = await axios.post(`${API_BASE}/cards`, { title: text, listId: targetList.id });
         const newCard = res.data;
         
         const augmentedCard = {
