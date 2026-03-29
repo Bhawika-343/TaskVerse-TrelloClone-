@@ -238,7 +238,19 @@ function App() {
         });
         updateActiveBoardLists(newLists);
     } catch (err) { 
-        alert("Failed to save full card to MySQL database. Server might be down."); 
+        console.warn("Backend unreachable. Saving card locally.");
+        const fallbackCard = {
+            id: `c-local-${Date.now()}`,
+            title: text,
+            description: "", comments: [], attachments: [], checklists: [], cover: "", labels: [], members: [], dueDate: ""
+        };
+        const newLists = lists.map((l, i) => {
+            if (i === listIndex) {
+                return { ...l, cards: [...l.cards, fallbackCard] };
+            }
+            return l;
+        });
+        updateActiveBoardLists(newLists);
     }
   };
 
