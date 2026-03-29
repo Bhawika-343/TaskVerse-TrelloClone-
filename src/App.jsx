@@ -19,8 +19,15 @@ const fallbackBoards = [
     title: "Bhawika's Productivity Board",
     background: "linear-gradient(135deg, #026bb9, #004d8f)",
     lists: [
-      { id: "l-1", title: "To Do", cards: [{ id: "c-1", title: "Complete Trello Clone Project" }, { id: "c-2", title: "Prepare for Placement Interviews" }, { id: "c-3", title: "Revise DSA Questions" }] },
-      { id: "l-2", title: "In Progress", cards: [{ id: "c-4", title: "Work on Backend Integration" }, { id: "c-5", title: "Improve UI Design" }] }
+      { id: "l-1", title: "To Do", cards: [
+         { id: "c-1", title: "Complete Trello Clone Project", cover: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=400&q=80" }, 
+         { id: "c-2", title: "Prepare for Placement Interviews", cover: "https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=400&q=80" }, 
+         { id: "c-3", title: "Revise DSA Questions", cover: "https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?auto=format&fit=crop&w=400&q=80" }
+      ]},
+      { id: "l-2", title: "In Progress", cards: [
+         { id: "c-4", title: "Work on Backend Integration", cover: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=400&q=80" }, 
+         { id: "c-5", title: "Improve UI Design", cover: "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=400&q=80" }
+      ]}
     ]
   },
   {
@@ -28,7 +35,11 @@ const fallbackBoards = [
     title: "Bhawika's Daily Stuffs",
     background: "linear-gradient(135deg, #026bb9, #004d8f)",
     lists: [
-      { id: "l-3", title: "Personal Tasks", cards: [{ id: "c-6", title: "Sleep 6 hours" }, { id: "c-7", title: "Hit the Gym" }, { id: "c-8", title: "Diet Plan" }] }
+      { id: "l-3", title: "Personal Tasks", cards: [
+         { id: "c-6", title: "Sleep 6 hours", cover: "/sleep_cover.png" }, 
+         { id: "c-7", title: "Hit the Gym", cover: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=400&q=80" }, 
+         { id: "c-8", title: "Diet Plan", cover: "/diet_cover.png" }
+      ]}
     ]
   }
 ];
