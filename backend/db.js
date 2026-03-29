@@ -6,7 +6,8 @@ const db = mysql.createConnection({
   user: process.env.DB_USER || "root",
   password: process.env.DB_PASSWORD || "Bhawika@123", 
   database: process.env.DB_NAME || "taskverse",
-  port: process.env.DB_PORT || 3306
+  port: process.env.DB_PORT || 3306,
+  multipleStatements: true // Essential for running seed.sql
 });
 
 db.connect((err) => {

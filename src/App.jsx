@@ -13,6 +13,19 @@ const mockLabels = [
   { id: "l-green", color: "#10b981", name: "Done" },
 ];
 
+const fallbackBoards = [
+  {
+    id: "b-proto",
+    title: "Demo: Product Launch 🚀",
+    background: "linear-gradient(135deg, #026bb9, #004d8f)",
+    lists: [
+      { id: "l-p1", title: "Target Tasks", cards: [{ id: "c-p1", title: "Design Landing Page", description: "Use Figma for initial wireframes" }, { id: "c-p2", title: "Setup Database", description: "Use MySQL and seed initial data" }] },
+      { id: "l-p2", title: "In Progress", cards: [{ id: "c-p3", title: "Vercel Deployment", description: "Configure environment variables" }] },
+      { id: "l-p3", title: "Done", cards: [{ id: "c-p4", title: "Repo Initialization", description: "Git init and push to GitHub" }] }
+    ]
+  }
+];
+
 function App() {
   const [data, setData] = useState({ boards: [], activeBoardId: null });
   const [loading, setLoading] = useState(true);
@@ -32,21 +45,28 @@ function App() {
 
   useEffect(() => {
     axios.get(`${API_BASE}/boards`).then((res) => {
+      let rawBoards = [];
+      
+      if (res.data.status === "UNINITIALIZED") {
+         console.warn("DB is empty. Using fallback boards for demo.");
+         rawBoards = fallbackBoards;
+      } else if (res.data.status === "ERROR") {
+         console.error("DB connection error. Using fallback boards.");
+         rawBoards = fallbackBoards;
+      } else {
+         rawBoards = res.data;
+      }
+
       const bonusCache = JSON.parse(localStorage.getItem('taskverse-bonus-cache')) || {};
       
       const defaultCovers = {
-          'c-1': 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=400&q=80', // Coding/Trello
-          'c-2': 'https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=400&q=80', // Interview/Office
-          'c-3': 'https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?auto=format&fit=crop&w=400&q=80', // DSA/Code
-          'c-4': 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=400&q=80', // Server/Backend
-          'c-5': 'https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=400&q=80',  // UI Design/Colors
-          'c-6': '/sleep_cover.png', // Sleep/Bed AI Photo
-          'c-7': 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=400&q=80', // Gym/Weights
-          'c-8': '/diet_cover.png'  // Healthy Food/Diet AI Photo
+          'c-1': 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=400&q=80',
+          'c-2': 'https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=400&q=80',
+          'c-3': 'https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?auto=format&fit=crop&w=400&q=80',
       };
 
-      const augmentedBoards = res.data.map((board) => {
-          const boardBonus = bonusCache[board.id] || { background: "linear-gradient(135deg, #026bb9, #004d8f)" };
+      const augmentedBoards = rawBoards.map((board) => {
+          const boardBonus = bonusCache[board.id] || { background: board.background || "linear-gradient(135deg, #026bb9, #004d8f)" };
           return {
               ...board,
               background: boardBonus.background,
@@ -56,11 +76,11 @@ function App() {
                       const cardBonus = bonusCache[card.id] || {};
                       return {
                           ...card,
-                          description: cardBonus.description || "",
+                          description: cardBonus.description || card.description || "",
                           comments: cardBonus.comments || [],
                           attachments: cardBonus.attachments || [],
                           checklists: cardBonus.checklists || [],
-                          cover: (['c-6', 'c-8'].includes(card.id) ? defaultCovers[card.id] : (cardBonus.cover || defaultCovers[card.id] || "")),
+                          cover: cardBonus.cover || defaultCovers[card.id] || "",
                           labels: cardBonus.labels || [],
                           members: cardBonus.members || [],
                           dueDate: cardBonus.dueDate || ""
@@ -76,7 +96,8 @@ function App() {
       });
       setLoading(false);
     }).catch(err => {
-        console.error("Backend offline. Fallback to mock data.", err);
+        console.error("Backend unreachable. Using fallback.", err);
+        setData({ boards: fallbackBoards, activeBoardId: fallbackBoards[0].id });
         setLoading(false);
     });
   }, []);
@@ -234,8 +255,55 @@ function App() {
      setSelectedCardInfo({ ...selectedCardInfo, card: updatedCard });
   };
   
-  if (loading) return <div style={{width:'100vw',height:'100vh',background:'#004d8f',color:'white',display:'flex',justifyContent:'center',alignItems:'center',fontFamily:'Inter'}}><h2>Loading Taskverse from MySQL...</h2></div>;
-  if (!activeBoard) return <div style={{width:'100vw',height:'100vh',background:'#004d8f',color:'white',display:'flex',justifyContent:'center',alignItems:'center',fontFamily:'Inter'}}><h2>No boards found in MySQL Database. Start by adding one to MySQL!</h2></div>;
+  const handleSeed = async () => {
+    if (!confirm("This will initialize your cloud database with demo data. Continue?")) return;
+    setLoading(true);
+    try {
+        await axios.post(`${API_BASE}/seed`);
+        window.location.reload();
+    } catch (err) {
+        alert("Seeding failed. Make sure your backend is running and DB credentials are correct.");
+        setLoading(false);
+    }
+  };
+
+  const createFirstBoard = async () => {
+     const title = prompt("Enter first board title:");
+     if (!title) return;
+     // Locally add for now, or you can implement a POST /boards if you want
+     const newBoard = { id: `b-${Date.now()}`, title, lists: [], background: "linear-gradient(135deg, #026bb9, #004d8f)" };
+     setData({ boards: [newBoard], activeBoardId: newBoard.id });
+  };
+
+  if (loading) return <div style={{width:'100vw',height:'100vh',background:'#004d8f',color:'white',display:'flex',justifyContent:'center',alignItems:'center',fontFamily:'Inter'}}><h2>Loading Taskverse...</h2></div>;
+
+  if (data.boards.length === 0) {
+      return (
+          <div style={{width:'100vw',height:'100vh',background:'#004d8f',color:'white',display:'flex',flexDirection:'column',justifyContent:'center',alignItems:'center',fontFamily:'Inter', textAlign:'center', padding: '20px'}}>
+             <h1 style={{fontSize: '48px', marginBottom: '10px'}}>Welcome to Taskverse 🌌</h1>
+             <p style={{fontSize: '18px', opacity: 0.8, maxWidth: '600px', marginBottom: '30px'}}>
+                It looks like your database is empty. You can start fresh by creating a board, or automatically seed the database with demo tasks.
+             </p>
+             <div style={{display:'flex', gap: '20px'}}>
+                <button 
+                   onClick={createFirstBoard}
+                   style={{padding: '12px 30px', borderRadius: '30px', border: 'none', background: 'white', color: '#004d8f', fontWeight: 700, cursor:'pointer', fontSize: '16px'}}
+                >
+                   + Create My First Board
+                </button>
+                <button 
+                   onClick={handleSeed}
+                   style={{padding: '12px 30px', borderRadius: '30px', border: '2px solid white', background: 'transparent', color: 'white', fontWeight: 700, cursor:'pointer', fontSize: '16px'}}
+                >
+                   🚀 Seed Demo Data
+                </button>
+             </div>
+             <p style={{marginTop: '40px', fontSize: '12px', opacity: 0.5}}>
+                Using Cloud Database? Make sure your Vercel Environment Variables are set.
+             </p>
+          </div>
+      );
+  }
 
   return (
     <div className="app-container" style={{ background: activeBoard.background }}>

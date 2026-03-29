@@ -1,3 +1,4 @@
+require('dotenv').config();
 const mysql = require('mysql2/promise');
 const fs = require('fs');
 const path = require('path');
@@ -6,9 +7,10 @@ async function seed() {
     try {
         console.log("Connecting to MySQL to automatically insert the Expected Assignment Data...");
         const connection = await mysql.createConnection({
-            host: 'localhost',
-            user: 'root',
-            password: 'Bhawika@123',
+            host: process.env.DB_HOST || 'localhost',
+            user: process.env.DB_USER || 'root',
+            password: process.env.DB_PASSWORD || 'Bhawika@123',
+            database: process.env.DB_NAME || 'taskverse',
             multipleStatements: true // Allows running an entire .sql file at once
         });
 

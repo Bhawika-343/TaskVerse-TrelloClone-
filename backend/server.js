@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const db = require("./db");
+const fs = require("fs");
+const path = require("path");
 
 const app = express();
 
@@ -11,6 +13,10 @@ app.use(express.json());
 app.get("/boards", async (req, res) => {
   try {
     const [boards] = await db.promise().query("SELECT * FROM boards");
+
+    if (boards.length === 0) {
+        return res.json({ status: "UNINITIALIZED", message: "Database is connected but empty. Please seed." });
+    }
 
     for (let board of boards) {
       const [lists] = await db
@@ -31,7 +37,23 @@ app.get("/boards", async (req, res) => {
     res.json(boards);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ status: "ERROR", error: "Database connection failed or MySQL is offline." });
+  }
+});
+
+// ✅ SEED DATABASE (Run the seed.sql script)
+app.post("/seed", async (req, res) => {
+  try {
+    const scriptPath = path.join(__dirname, 'seed.sql');
+    const script = fs.readFileSync(scriptPath, 'utf8');
+
+    // Run the entire script (multipleStatements: true is required in db.js)
+    await db.promise().query(script);
+    
+    res.json({ success: true, message: "Database seeded perfectly! 🚀" });
+  } catch (err) {
+    console.error("Seed error:", err);
+    res.status(500).json({ error: "Failed to seed database: " + err.message });
   }
 });
 
