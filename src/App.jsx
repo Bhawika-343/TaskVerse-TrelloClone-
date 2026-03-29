@@ -15,13 +15,20 @@ const mockLabels = [
 
 const fallbackBoards = [
   {
-    id: "b-proto",
-    title: "Demo: Product Launch 🚀",
+    id: "b-1",
+    title: "Bhawika's Productivity Board",
     background: "linear-gradient(135deg, #026bb9, #004d8f)",
     lists: [
-      { id: "l-p1", title: "Target Tasks", cards: [{ id: "c-p1", title: "Design Landing Page", description: "Use Figma for initial wireframes" }, { id: "c-p2", title: "Setup Database", description: "Use MySQL and seed initial data" }] },
-      { id: "l-p2", title: "In Progress", cards: [{ id: "c-p3", title: "Vercel Deployment", description: "Configure environment variables" }] },
-      { id: "l-p3", title: "Done", cards: [{ id: "c-p4", title: "Repo Initialization", description: "Git init and push to GitHub" }] }
+      { id: "l-1", title: "To Do", cards: [{ id: "c-1", title: "Complete Trello Clone Project" }, { id: "c-2", title: "Prepare for Placement Interviews" }, { id: "c-3", title: "Revise DSA Questions" }] },
+      { id: "l-2", title: "In Progress", cards: [{ id: "c-4", title: "Work on Backend Integration" }, { id: "c-5", title: "Improve UI Design" }] }
+    ]
+  },
+  {
+    id: "b-2",
+    title: "Bhawika's Daily Stuffs",
+    background: "linear-gradient(135deg, #026bb9, #004d8f)",
+    lists: [
+      { id: "l-3", title: "Personal Tasks", cards: [{ id: "c-6", title: "Sleep 6 hours" }, { id: "c-7", title: "Hit the Gym" }, { id: "c-8", title: "Diet Plan" }] }
     ]
   }
 ];
@@ -63,6 +70,11 @@ function App() {
           'c-1': 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=400&q=80',
           'c-2': 'https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=400&q=80',
           'c-3': 'https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?auto=format&fit=crop&w=400&q=80',
+          'c-4': 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=400&q=80',
+          'c-5': 'https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=400&q=80', 
+          'c-6': '/sleep_cover.png',
+          'c-7': 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=400&q=80',
+          'c-8': '/diet_cover.png'
       };
 
       const augmentedBoards = rawBoards.map((board) => {
